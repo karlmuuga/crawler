@@ -25,17 +25,16 @@ public class Crawler {
 		String sql = "SELECT * FROM links WHERE URI = '" + URI + "'";
 		ResultSet results = db.stringQuery(sql);
 		if (results.next()) {
-			// If it returns true, it means it was in the database and is not
-			// worth parsing again
+			/* If it returns true, it means it was in the database and is not
+		 	worth parsing again */
 		} else {
-			// Store the URI into the database table in order not to parse it
-			// again
+			// Store the URI into the database table in order not to parse it again
 			sql = "INSERT INTO  `links` " + "(`URI`) VALUES " + "(?);";
 			PreparedStatement stmt = db.protocol.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			stmt.setString(1, URI);
 			stmt.execute();
 
-			// see if the predefined webpage has got any useful information
+			// Try to receive the document
 			try{
 				Document doco = Jsoup.connect(URI).get();
 				if (doco.text().contains(searchFor)) {
@@ -70,9 +69,11 @@ public class Crawler {
 					startingPoint(split[0], searchFor);
 				}
 			} catch (MalformedURLException e) {
-			    // the URL is not in a valid form
+			    // The given URL is not a true one
+				System.out.println("Please check your URL!");
 			} catch (IOException e) {
-			    // the connection couldn't be established
+			    // We cannot connect to the server
+				System.out.println("Please check your connection!");
 			}
 			
 			
